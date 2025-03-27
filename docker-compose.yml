@@ -4,6 +4,3 @@ services:
     build: .
     ports:
       - "3301:3301" # Открываем порт 3301 наружу
-    volumes:
-      - ./data:/var/lib/tarantool # Монтируем директорию для хранения данных
-    command: [ "tarantool", "/opt/tarantool/init_tarantool.lua" ] # Указываем команду для запуска

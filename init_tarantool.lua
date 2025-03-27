@@ -20,6 +20,3 @@ db:create_index('primary', {
   parts = { 'id' },
   if_not_exists = true
 })
-
-
-db:insert({ "1", '{"name": "John Doe", "age": 30}' })
