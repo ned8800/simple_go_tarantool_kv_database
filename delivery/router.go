@@ -17,16 +17,17 @@ func NewRouter() *mux.Router {
 
 func SetupRoutes(router *mux.Router, tarantoolConn *tarantool.Connection) {
 
-	_ = tarantoolmanager.NewTarantoolManager(tarantoolConn)
+	tm := tarantoolmanager.NewTarantoolManager(tarantoolConn)
 
-	router.HandleFunc("/kv", tarantoolmanager.InsertValueHandler).Methods(http.MethodPost, http.MethodOptions)
+	router.HandleFunc("/kv", tm.InsertValueHandler).Methods(http.MethodPost, http.MethodOptions)
 
-	router.HandleFunc("/kv/{id}", tarantoolmanager.UpdateValueHandler).Methods(http.MethodPut, http.MethodOptions)
-	router.HandleFunc("/kv/{id}", tarantoolmanager.GetValueHandler).Methods(http.MethodGet, http.MethodOptions)
-	router.HandleFunc("/kv/{id}", tarantoolmanager.DeleteValueHandler).Methods(http.MethodDelete, http.MethodOptions)
+	router.HandleFunc("/kv/{id}", tm.UpdateValueHandler).Methods(http.MethodPut, http.MethodOptions)
+	router.HandleFunc("/kv/{id}", tm.GetValueHandler).Methods(http.MethodGet, http.MethodOptions)
+	router.HandleFunc("/kv/{id}", tm.DeleteValueHandler).Methods(http.MethodDelete, http.MethodOptions)
 
 }
 
 func ApplyMiddlewares(router *mux.Router) {
 	router.Use(middleware.AccessLogMiddleware)
+	router.Use(middleware.WithLogger)
 }

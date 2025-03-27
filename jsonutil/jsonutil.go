@@ -17,8 +17,7 @@ const (
 )
 
 type ErrorResponse struct {
-	Error   string `json:"error"`
-	Message string `json:"message"`
+	Error string `json:"error"`
 }
 
 func SendError(ctx context.Context, w http.ResponseWriter, errCode int, errResp string) {

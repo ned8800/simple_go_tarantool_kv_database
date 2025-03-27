@@ -5,20 +5,12 @@ import (
 	"os"
 	"path/filepath"
 	"simple_go_tarantool_kv_database/config/defaults"
+	errorconstants "simple_go_tarantool_kv_database/error_constants"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-)
-
-const (
-	ErrInitializeConfig  = "Error initializing config"
-	ErrUnmarshalConfig   = "Error unmarshalling config"
-	ErrReadConfig        = "Error reading config"
-	ErrReadEnvironment   = "Error reading .env file"
-	ErrGetDirectory      = "Error getting directory"
-	ErrDirectoryNotFound = "Error finding directory"
 )
 
 const (
@@ -48,7 +40,6 @@ const (
 
 type Config struct {
 	Server Server `yaml:"server" mapstructure:"server"`
-	Cookie Cookie `yaml:"cookie" mapstructure:"cookie"`
 }
 
 type Server struct {
@@ -60,28 +51,18 @@ type Server struct {
 	IdleTimeout     time.Duration `yaml:"idle_timeout" mapstructure:"idle_timeout"`
 }
 
-type Cookie struct {
-	SessionName   string        `yaml:"session_name" mapstructure:"session_name"`
-	SessionLength int           `yaml:"session_length" mapstructure:"session_length"`
-	HTTPOnly      bool          `yaml:"http_only" mapstructure:"http_only"`
-	Secure        bool          `yaml:"secure" mapstructure:"secure"`
-	SameSite      http.SameSite `yaml:"same_site" mapstructure:"same_site"`
-	Path          string        `yaml:"path" mapstructure:"path"`
-	ExpirationAge int           `yaml:"expiration_age" mapstructure:"expiration_age"`
-}
-
 func New() (*Config, error) {
 	log.Info().Msg("Initializing config")
 
 	if err := setupViper(); err != nil {
-		log.Error().Err(errors.Wrap(err, ErrInitializeConfig)).Msg(errors.Wrap(err, ErrInitializeConfig).Error())
-		return nil, errors.Wrap(err, ErrInitializeConfig)
+		log.Error().Err(errors.Wrap(err, errorconstants.ErrInitializeConfig)).Msg(errors.Wrap(err, errorconstants.ErrInitializeConfig).Error())
+		return nil, errors.Wrap(err, errorconstants.ErrInitializeConfig)
 	}
 
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
-		log.Error().Err(errors.Wrap(err, ErrUnmarshalConfig)).Msg(errors.Wrap(err, ErrUnmarshalConfig).Error())
-		return nil, errors.Wrap(err, ErrUnmarshalConfig)
+		log.Error().Err(errors.Wrap(err, errorconstants.ErrUnmarshalConfig)).Msg(errors.Wrap(err, errorconstants.ErrUnmarshalConfig).Error())
+		return nil, errors.Wrap(err, errorconstants.ErrUnmarshalConfig)
 	}
 
 	log.Info().Msg("Config initialized")
@@ -101,7 +82,7 @@ func findEnvDir() (string, error) {
 	log.Info().Msg("Finding environment dir")
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return "", errors.Wrap(err, ErrGetDirectory)
+		return "", errors.Wrap(err, errorconstants.ErrGetDirectory)
 	}
 
 	for i := 0; i < MaxFindingEnvDepth; i++ {
@@ -113,12 +94,12 @@ func findEnvDir() (string, error) {
 
 		parentDir := filepath.Dir(currentDir)
 		if parentDir == currentDir {
-			return "", errors.Wrap(err, ErrDirectoryNotFound)
+			return "", errors.Wrap(err, errorconstants.ErrDirectoryNotFound)
 		}
 		currentDir = parentDir
 	}
 
-	return "", errors.Wrap(err, ErrDirectoryNotFound)
+	return "", errors.Wrap(err, errorconstants.ErrDirectoryNotFound)
 }
 
 func setupViper() error {
@@ -126,7 +107,7 @@ func setupViper() error {
 
 	envDir, err := findEnvDir()
 	if err != nil {
-		wrapped := errors.Wrap(err, ErrDirectoryNotFound)
+		wrapped := errors.Wrap(err, errorconstants.ErrDirectoryNotFound)
 		log.Error().Err(wrapped).Msg(wrapped.Error())
 		return wrapped
 	}
@@ -136,7 +117,7 @@ func setupViper() error {
 	viper.AddConfigPath(envDir)
 
 	if err := viper.ReadInConfig(); err != nil {
-		wrapped := errors.Wrap(err, ErrReadEnvironment)
+		wrapped := errors.Wrap(err, errorconstants.ErrReadEnvironment)
 		log.Error().Err(wrapped).Msg(wrapped.Error())
 		return wrapped
 	}
@@ -148,7 +129,7 @@ func setupViper() error {
 	setupServer()
 
 	if err := viper.MergeInConfig(); err != nil {
-		wrapped := errors.Wrap(err, ErrReadConfig)
+		wrapped := errors.Wrap(err, errorconstants.ErrReadConfig)
 		log.Error().Err(wrapped).Msg(wrapped.Error())
 		return wrapped
 	}
