@@ -33,7 +33,7 @@ curl -X POST -H 'Content-Type: application/json' -d '{ "key": "test", "value": {
  * PUT:
 
 ``` bash
-curl -X PUT -H 'Content-Type: application/json' -d '{ "key": "test", "value": {"SOME": "NEW ARBITRARY JSON"} }' http://217.16.20.177:8090/kv
+curl -X PUT -H 'Content-Type: application/json' -d '{ "key": "test", "value": {"SOME": "NEW ARBITRARY JSON"} }' http://217.16.20.177:8090/kv/test
 ```
 
  * DELETE:
